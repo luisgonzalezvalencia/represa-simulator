@@ -131,22 +131,25 @@ export class SimuladorAccionComponent implements OnInit {
     }
 
     //por cada compuerta verificamos si sobrepaso el nivel del agua requerido y lo abrimos o cerramos
-    this.compuertasEvacuacion.forEach(
-      (compuerta) => {
-        if (compuerta.nivel < this.nivelActualRepresa) {
-          compuerta.abierto = true;
-        } else {
-          compuerta.abierto = false;
-        }
+    for (let index = 0; index < this.compuertasEvacuacion.length; index++) {
+      let compuerta = { ...this.compuertasEvacuacion[index] };
+      if (compuerta.nivel <= this.nivelActualRepresa) {
+        compuerta.abierto = true;
+      } else {
+        compuerta.abierto = false;
       }
-    );
+      this.compuertasEvacuacion[index] = compuerta;
+    }
+
+    console.log(this.compuertasEvacuacion);
+
+    //si se supera la capacidad maxima de la represa, enciendo alerta roja y sumo contador de alertas
     if (this.nivelActualRepresa > this.maximoRepresa) {
       this.alertaRojo = true;
       this.contadorAlertasRojas += 1;
     } else {
       this.alertaRojo = false;
     }
-    console.log(this.compuertasEvacuacion);
   }
 
   simular() {
@@ -168,9 +171,10 @@ export class SimuladorAccionComponent implements OnInit {
   }
 
   agregarResultado(valorFuncion: number, variacionMarca: number) {
+    let copyCompuertas = [...this.compuertasEvacuacion];
     this.resultadosSimulacion.push(
       {
-        estadoCompuertas: this.compuertasEvacuacion,
+        estadoCompuertas: copyCompuertas,
         iteracion: this.iteracionActual,
         valorFuncion: valorFuncion,
         variacionMarca: variacionMarca,
