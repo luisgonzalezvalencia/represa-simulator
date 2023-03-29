@@ -1,4 +1,14 @@
 <h3>Inicializar simulación</h3>
-
-<input type="text" class="form-control" placeholder="Cantidad Iteraciones">
+<label>Nivel Inicial del Agua: </label>
+<input type="number" [(ngModel)]="nivelInicial" class="form-control" placeholder="Nivel Inicial del Agua">
+<br>
+<label>Cantidad de Iteraciones (días): </label>
+<input type="number" [(ngModel)]="cantidadIteraciones" class="form-control" placeholder="Cantidad Iteraciones">
+<br>
 <button (click)="iniciarSimulacion()"> Iniciar</button>
+<button (click)="limpiarSimulacion()"> Limpiar</button>
+
+<div *ngIf="simulacionIniciada">
+    <app-resultados-simulacion [resultados]="resultadosSimulacion"></app-resultados-simulacion>
+
+</div>

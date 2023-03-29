@@ -1,0 +1,40 @@
+<h1>Resultados de la Simulación</h1>
+
+<span>
+    <h3 class="danger">Cantidad de alertas Rojas: {{cantidadAlertasRojas()}}
+        <button (click)="mostrarSoloAlertas()">Mostrar {{ soloAlertas == true ? "Todos" : "Solo Alertas"}}</button>
+
+    </h3>
+
+</span>
+
+<table>
+    <tr>
+        <td><b>Iteracion</b></td>
+        <td><b>Nivel Actual (Litros)</b></td>
+        <td><b>Valor de Funcion (F(x))</b></td>
+        <td><b>Varciacion Nivel (Litros)</b></td>
+        <td><b>Estado Compuerta 1</b></td>
+        <td><b>Estado Compuerta 2</b></td>
+        <td><b>Estado Compuerta 3</b></td>
+        <td><b>Estado Compuerta 4</b></td>
+        <td><b>Alerta Roja</b></td>
+    </tr>
+    <ng-container *ngFor="let resultado of resultados">
+        <tr *ngIf="!soloAlertas || (resultado.alertaRojo == true && soloAlertas)"
+            [class]="resultado.alertaRojo == true ? 'danger': ''">
+            <td>{{resultado.iteracion}}</td>
+            <td>{{resultado.nivelActual}}</td>
+            <td>{{resultado.valorFuncion}}</td>
+            <td>{{resultado.variacionMarca}}</td>
+            <td>{{resultado.estadoCompuertas[0].abierto == true ? "Abierto": "Cerrado"}}</td>
+            <td>{{resultado.estadoCompuertas[1].abierto == true ? "Abierto": "Cerrado"}}</td>
+            <td>{{resultado.estadoCompuertas[2].abierto == true ? "Abierto": "Cerrado"}}</td>
+            <td>{{resultado.estadoCompuertas[3].abierto == true ? "Abierto": "Cerrado"}}</td>
+            <td>{{resultado.alertaRojo == true ? "Encendido":
+                "Apagado"}}</td>
+        </tr>
+    </ng-container>
+
+
+</table>
