@@ -30,6 +30,8 @@ export class SimuladorAccionComponent implements OnInit {
 
   iteracionActual: number = 0;
 
+  semillaActual: number = 40;
+
   private maximoRepresa: number = 45; //45 litros es la maxima capacidad
   private nivelActualRepresa: number = 0;
   private iteraciones: number = 0;
@@ -106,6 +108,8 @@ export class SimuladorAccionComponent implements OnInit {
 
   iniciarSimulacion() {
     console.log("Simulacion iniciada");
+    //test semillas
+    // this.fSemilla(Math.random() * 100000, Math.random() * 100000, 100, 30);
 
     //ingresamos el nivel actual del agua y validamos el estado inicial de las compuertas
     if (!this.simulacionIniciada) {
@@ -153,10 +157,18 @@ export class SimuladorAccionComponent implements OnInit {
   }
 
   simular() {
+
     //obtener un numero random entre 0 y 1 de 4 decimales
     const array = new Uint32Array(1);
     window.crypto.getRandomValues(array);
-    let valorFuncion = parseFloat((array[0] / (Math.pow(2, 32) - 1)).toFixed(4));
+
+    let x = this.semillaActual;
+    let a = parseInt((Math.random() * 100).toFixed(2));
+    let b = parseInt((Math.random() * 100).toFixed(2));
+    let m = 100;
+    this.semillaActual = parseFloat(((((a * x) + b) % m) / 100).toFixed(4));
+    // let valorFuncion = parseFloat((array[0] / (Math.pow(2, 32) - 1)).toFixed(4));
+    let valorFuncion = this.semillaActual;
 
     // let valorFuncion = parseFloat((Math.random()).toFixed(4));
     let variacionMarca = this.tablaFuncion.find(tf => valorFuncion >= tf.valorMin && valorFuncion <= tf.valorMax)?.marca;
@@ -194,6 +206,19 @@ export class SimuladorAccionComponent implements OnInit {
     this.nivelActualRepresa = 0;
     this.iteraciones = 0;
     this.resultadosSimulacion = [];
+  }
+
+  fSemilla(a: number, b: number, m: number, n: number) {
+    let arraySemillas: number[] = [];
+    //n las iteraciones
+    for (var i = 0; i < n; i++) {
+      let x = this.semillaActual;
+      this.semillaActual = parseFloat(((((a * x) + b) % m) / 100).toFixed(4));
+      arraySemillas.push(this.semillaActual);
+    }
+
+
+    console.log(arraySemillas);
   }
 
 }
