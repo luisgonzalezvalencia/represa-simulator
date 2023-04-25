@@ -138,12 +138,14 @@ export class SimuladorAccionComponent implements OnInit {
     }
   }
 
-  simular() {
+  async simular() {
     //obtener un numero random entre 0 y 1 de 4 decimales
     const array = new Uint32Array(1);
     window.crypto.getRandomValues(array);
     let valorFuncion = parseFloat((array[0] / (Math.pow(2, 32) - 1)).toFixed(4));
 
+    let randomNumber = await this.generateRandomNumber(this.cantidadIteraciones.toString());
+    console.log(randomNumber);
     // let valorFuncion = parseFloat((Math.random()).toFixed(4));
     let variacionMarca = this.tablaFuncion.find(tf => valorFuncion >= tf.valorMin && valorFuncion <= tf.valorMax)?.marca;
     if (variacionMarca != undefined) {
@@ -219,5 +221,31 @@ export class SimuladorAccionComponent implements OnInit {
     }
     console.log(arraySemillas);
   }
+
+
+  // Para implementar el método de los números aleatorios verdaderos
+  // se puede utilizar una fuente de ruido física como la fluctuación
+  //  térmica de un resistor o el ruido atmosférico. Sin embargo, como
+  //  esto requiere de hardware especializado.
+  //  un ejemplo sencillo de cómo simular números aleatorios verdaderos
+  //  utilizando una combinación de la fecha y hora del sistema y la entrada del usuario:
+  async generateRandomNumber(userInput: string): Promise<number> {
+    const timestamp = new Date().getTime().toString();
+    const inputHash = await this.sha256(userInput);
+    const combinedString = timestamp + inputHash;
+    const hash = await this.sha256(combinedString);
+    const maxValue = Math.pow(2, 256);
+    return parseInt(hash, 16) / maxValue;
+  }
+
+  async sha256(message: string): Promise<string> {
+    const buffer = new TextEncoder().encode(message);
+    const hash = await crypto.subtle.digest("SHA-256", buffer);
+    const hexString = Array.from(new Uint8Array(hash))
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hexString;
+  }
+
 
 }
