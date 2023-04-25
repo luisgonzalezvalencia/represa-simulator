@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
+//interfaces necesarias para definir los objetos
 export interface Compuerta {
   compuerta: number;
   nivel: number;
@@ -22,6 +23,7 @@ export interface ResultadoSimulacion {
 })
 export class SimuladorAccionComponent implements OnInit {
 
+  //variables iniciales
   nivelInicial: number = 30; //30 litros
   cantidadIteraciones: number = 10;
   simulacionIniciada: boolean = false;
@@ -76,6 +78,7 @@ export class SimuladorAccionComponent implements OnInit {
     }
   ];
 
+  //compuertas de evacuacion con niveles y estado cerrado por default
   private compuertasEvacuacion: Compuerta[] = [
     {
       compuerta: 1,
@@ -111,6 +114,21 @@ export class SimuladorAccionComponent implements OnInit {
     //test semillas
     // this.fSemilla(Math.random() * 100000, Math.random() * 100000, 100, 30);
 
+    //seteamos el nivel del agua inicial y el estado de las compuertas en ese nivel.
+    this.registrarEstadoInicial();
+
+    //luego por cada dia (iteracion) generamos la simulacion
+    for (let i = 0; i < this.cantidadIteraciones; i++) {
+      this.iteracionActual += 1;
+      this.simular();
+    }
+
+    //al finalizar las iteraciones, seteamos el nivel inicial con el ultimo
+    //nivel generado con las iteraciones
+    this.nivelInicial = this.nivelActualRepresa;
+  }
+
+  registrarEstadoInicial() {
     //ingresamos el nivel actual del agua y validamos el estado inicial de las compuertas
     if (!this.simulacionIniciada) {
       this.simulacionIniciada = true;
@@ -118,14 +136,24 @@ export class SimuladorAccionComponent implements OnInit {
       this.validarNivelCompuertas();
       this.agregarResultado(0, 0);
     }
-    //luego por cada dia (iteracion) generamos la simulacion
-    for (let i = 0; i < this.cantidadIteraciones; i++) {
-      this.iteracionActual += 1;
-      this.simular();
-    }
+  }
 
-    console.log(this.resultadosSimulacion);
-    this.nivelInicial = this.nivelActualRepresa;
+  simular() {
+    //obtener un numero random entre 0 y 1 de 4 decimales
+    const array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
+    let valorFuncion = parseFloat((array[0] / (Math.pow(2, 32) - 1)).toFixed(4));
+
+    // let valorFuncion = parseFloat((Math.random()).toFixed(4));
+    let variacionMarca = this.tablaFuncion.find(tf => valorFuncion >= tf.valorMin && valorFuncion <= tf.valorMax)?.marca;
+    if (variacionMarca != undefined) {
+      this.nivelActualRepresa += variacionMarca;
+      this.validarNivelCompuertas();
+      this.agregarResultado(valorFuncion, variacionMarca);
+    } else {
+      console.log("Error al buscar un valor de marca");
+      console.log(valorFuncion);
+    }
   }
 
   validarNivelCompuertas() {
@@ -145,40 +173,13 @@ export class SimuladorAccionComponent implements OnInit {
       this.compuertasEvacuacion[index] = compuerta;
     }
 
-    console.log(this.compuertasEvacuacion);
-
-    //si se supera la capacidad maxima de la represa, enciendo alerta roja y sumo contador de alertas
+    //si se supera la capacidad maxima de la represa,
+    // enciendo alerta roja y sumo contador de alertas. Sino, seteo en falso la alerta roja
     if (this.nivelActualRepresa > this.maximoRepresa) {
       this.alertaRojo = true;
       this.contadorAlertasRojas += 1;
     } else {
       this.alertaRojo = false;
-    }
-  }
-
-  simular() {
-
-    //obtener un numero random entre 0 y 1 de 4 decimales
-    const array = new Uint32Array(1);
-    window.crypto.getRandomValues(array);
-
-    let x = this.semillaActual;
-    let a = parseInt((Math.random() * 100).toFixed(2));
-    let b = parseInt((Math.random() * 100).toFixed(2));
-    let m = 100;
-    this.semillaActual = parseFloat(((((a * x) + b) % m) / 100).toFixed(4));
-    // let valorFuncion = parseFloat((array[0] / (Math.pow(2, 32) - 1)).toFixed(4));
-    let valorFuncion = this.semillaActual;
-
-    // let valorFuncion = parseFloat((Math.random()).toFixed(4));
-    let variacionMarca = this.tablaFuncion.find(tf => valorFuncion >= tf.valorMin && valorFuncion <= tf.valorMax)?.marca;
-    if (variacionMarca != undefined) {
-      this.nivelActualRepresa += variacionMarca;
-      this.validarNivelCompuertas();
-      this.agregarResultado(valorFuncion, variacionMarca);
-    } else {
-      console.log("Error al buscar un valor de marca");
-      console.log(valorFuncion);
     }
   }
 
@@ -216,8 +217,6 @@ export class SimuladorAccionComponent implements OnInit {
       this.semillaActual = parseFloat(((((a * x) + b) % m) / 100).toFixed(4));
       arraySemillas.push(this.semillaActual);
     }
-
-
     console.log(arraySemillas);
   }
 
